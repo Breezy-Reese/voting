@@ -6,27 +6,27 @@ const candidates = [
   {
     name: 'John Doe',
     party: 'Party A',
-    profilePic: 'https://via.placeholder.com/150/0000FF/FFFFFF?text=John+Doe',
+    profilePic: 'https://dummyimage.com/150x150/0000FF/FFFFFF&text=John+Doe',
   },
   {
     name: 'Jane Smith',
     party: 'Party B',
-    profilePic: 'https://via.placeholder.com/150/FF0000/FFFFFF?text=Jane+Smith',
+    profilePic: 'https://dummyimage.com/150x150/FF0000/FFFFFF&text=Jane+Smith',
   },
   {
     name: 'Bob Johnson',
     party: 'Party C',
-    profilePic: 'https://via.placeholder.com/150/00FF00/FFFFFF?text=Bob+Johnson',
+    profilePic: 'https://dummyimage.com/150x150/00FF00/FFFFFF&text=Bob+Johnson',
   },
   {
     name: 'Alice Brown',
     party: 'Party D',
-    profilePic: 'https://via.placeholder.com/150/FFFF00/000000?text=Alice+Brown',
+    profilePic: 'https://dummyimage.com/150x150/FFFF00/000000&text=Alice+Brown',
   },
   {
     name: 'Charlie Wilson',
     party: 'Party E',
-    profilePic: 'https://via.placeholder.com/150/FF00FF/FFFFFF?text=Charlie+Wilson',
+    profilePic: 'https://dummyimage.com/150x150/FF00FF/FFFFFF&text=Charlie+Wilson',
   },
 ];
 
