@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import API from '../api';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const subcountiesByCounty = {
   "Makueni": ["Makueni Subcounty 1", "Makueni Subcounty 2", "Makueni Subcounty 3"],
@@ -371,6 +371,9 @@ export default function Register() {
             marginTop: '1rem'
           }}>Register</button>
         </form>
+        <p style={{ textAlign: 'center', marginTop: '1rem' }}>
+          Already have an account? <Link to="/login" style={{ color: '#007bff', textDecoration: 'none' }}>Login</Link>
+        </p>
       </div>
     </div>
   );
