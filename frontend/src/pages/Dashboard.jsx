@@ -1,12 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 import API from '../api';
 import CandidateCard from '../components/CandidateCard';
 
 export default function Dashboard() {
+  const { user, loading } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [candidates, setCandidates] = useState([]);
   const [selectedCandidates, setSelectedCandidates] = useState([]);
 
   useEffect(() => {
+    if (loading) return;
+    
+    // Protect: Admins should not access this page
+    if (user?.role === 'admin') {
+      console.log('Admin detected in Dashboard, redirecting to /admin');
+      navigate('/admin', { replace: true });
+      return;
+    }
+    
     const fetchCandidates = async () => {
       try {
         const res = await API.get('/candidates');
@@ -31,7 +44,7 @@ export default function Dashboard() {
       }
     };
     fetchCandidates();
-  }, []);
+  }, [loading, user, navigate]);
 
   const handleVote = async () => {
     try {
@@ -53,6 +66,15 @@ export default function Dashboard() {
       prev.includes(id) ? prev.filter((cid) => cid !== id) : [...prev, id]
     );
   };
+
+  // Guard: If loading or admin, don't render voter dashboard
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (user?.role === 'admin') {
+    return <div>Redirecting to admin dashboard...</div>;
+  }
 
   return (
     <div>

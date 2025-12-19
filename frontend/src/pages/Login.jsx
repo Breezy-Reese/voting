@@ -1,6 +1,7 @@
 import { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
+import API from '../api';
 
 export default function Login() {
   const { login } = useContext(AuthContext);
@@ -8,13 +9,41 @@ export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
+  const checkAdminStatus = async () => {
+    try {
+      const res = await API.get('/auth/debug/admin-check');
+      console.log('Admin check response:', res.data);
+      alert(JSON.stringify(res.data, null, 2));
+    } catch (err) {
+      console.error('Admin check error:', err);
+      alert('Error checking admin status');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await login(username, password);
-      alert('Login successful!');
-      navigate('/dashboard');
+      console.log('Attempting login with username:', username);
+      const user = await login(username, password);
+      console.log('===== LOGIN RESPONSE =====');
+      console.log('User object:', user);
+      console.log('User role:', user?.role);
+      console.log('Role type:', typeof user?.role);
+      console.log('Is admin check:', user?.role === 'admin');
+      
+      // Check role and navigate
+      if (user?.role === 'admin') {
+        console.log('✓ ADMIN USER DETECTED - Navigating to /admin');
+        navigate('/admin', { replace: true });
+      } else if (user?.role === 'user') {
+        console.log('✓ REGULAR USER DETECTED - Navigating to /dashboard');
+        navigate('/dashboard', { replace: true });
+      } else {
+        console.log('✗ UNKNOWN ROLE:', user?.role);
+        navigate('/dashboard', { replace: true });
+      }
     } catch (err) {
+      console.error('===== LOGIN ERROR =====', err);
       alert('Login failed! Check credentials.');
     }
   };
@@ -81,6 +110,17 @@ export default function Login() {
             marginTop: '1rem'
           }}>Login</button>
         </form>
+        <button onClick={checkAdminStatus} style={{
+          width: '100%',
+          padding: '0.75rem',
+          backgroundColor: '#6c757d',
+          color: 'white',
+          border: 'none',
+          borderRadius: '4px',
+          fontSize: '0.9rem',
+          cursor: 'pointer',
+          marginTop: '0.5rem'
+        }}>Check Admin Status</button>
         <p style={{ textAlign: 'center', marginTop: '1rem' }}>
           Don't have an account? <Link to="/register" style={{ color: '#007bff', textDecoration: 'none' }}>Register</Link>
         </p>

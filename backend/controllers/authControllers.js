@@ -43,8 +43,51 @@ exports.login = async (req, res) => {
     if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
     const token = generateToken(user._id);
-    res.json({ user: { id: user._id, username: user.username, role: user.role }, token });
+    const userResponse = { id: user._id, username: user.username, role: user.role };
+    console.log('Login successful for user:', username, 'Role:', user.role);
+    console.log('Sending response:', userResponse);
+    res.json({ user: userResponse, token });
   } catch (err) {
     res.status(500).json({ message: 'Login failed', error: err.message });
+  }
+};
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select('-password'); // Exclude password field
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching users', error: err.message });
+  }
+};
+
+exports.getUserCount = async (req, res) => {
+  try {
+    const count = await User.countDocuments();
+    res.json({ totalUsers: count });
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching user count', error: err.message });
+  }
+};
+
+exports.getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ user: { id: user._id, username: user.username, role: user.role } });
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching user', error: err.message });
+  }
+};
+
+exports.getUserRoleCounts = async (req, res) => {
+  try {
+    const counts = await User.aggregate([
+      { $group: { _id: '$role', count: { $sum: 1 } } }
+    ]);
+    const result = counts.map(c => ({ name: c._id, value: c.count }));
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching user role counts', error: err.message });
   }
 };

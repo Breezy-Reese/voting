@@ -1,4 +1,5 @@
 import { useEffect, useState, useContext } from 'react';
+import { Link } from 'react-router-dom';
 import API from '../api';
 import VoteForm from '../components/VoteForm';
 import { AuthContext } from '../context/AuthContext';
@@ -26,7 +27,45 @@ export default function Home() {
   };
 
   if (!user) {
-    return <div>Please log in to vote.</div>;
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        backgroundColor: '#f0f0f0'
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          padding: '2rem',
+          borderRadius: '8px',
+          boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+          textAlign: 'center',
+          maxWidth: '400px'
+        }}>
+          <h2>Please Log In to Vote</h2>
+          <p>You need to be logged in to participate in the voting process.</p>
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.5rem' }}>
+            <Link to="/login" style={{
+              padding: '0.75rem 1.5rem',
+              backgroundColor: '#007bff',
+              color: 'white',
+              textDecoration: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}>Login</Link>
+            <Link to="/register" style={{
+              padding: '0.75rem 1.5rem',
+              backgroundColor: '#28a745',
+              color: 'white',
+              textDecoration: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}>Register</Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Candidate = require('./models/candidate');
+const User = require('./models/User');
 require('dotenv').config();
 
 const candidates = [
@@ -30,10 +31,46 @@ const candidates = [
   },
 ];
 
+async function seedAdmin() {
+  try {
+    // Check if admin already exists
+    const existingAdmin = await User.findOne({ username: 'basil mutuku' });
+    if (existingAdmin) {
+      console.log('Admin user already exists');
+      console.log('Admin user role:', existingAdmin.role);
+      // Update role to make sure it's admin
+      if (existingAdmin.role !== 'admin') {
+        existingAdmin.role = 'admin';
+        await existingAdmin.save();
+        console.log('Updated admin role to admin');
+      }
+      return;
+    }
+
+    const adminUser = new User({
+      username: 'basil mutuku',
+      password: '#Basil123',
+      fullName: 'Basil Mutuku',
+      ward: 'Makueni Ward 1',
+      subcounty: 'Makueni Subcounty 1',
+      county: 'Makueni',
+      idNumber: 'ADMIN001',
+      role: 'admin',
+    });
+    await adminUser.save();
+    console.log('Admin user seeded successfully with role:', adminUser.role);
+  } catch (error) {
+    console.error('Error seeding admin:', error);
+  }
+}
+
 async function seedCandidates() {
   try {
     await mongoose.connect(process.env.MONGO_URI);
     console.log('Connected to MongoDB');
+
+    // Seed admin user
+    await seedAdmin();
 
     // Clear existing candidates
     await Candidate.deleteMany({});

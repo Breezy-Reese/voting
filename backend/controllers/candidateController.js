@@ -23,3 +23,43 @@ exports.removeCandidate = async (req, res) => {
     res.status(400).json({ message: 'Error removing candidate', error: err.message });
   }
 };
+
+exports.getCandidateVoteStats = async (req, res) => {
+  try {
+    const Vote = require('../models/vote');
+    const stats = await Vote.aggregate([
+      {
+        $group: {
+          _id: '$candidate',
+          voteCount: { $sum: 1 }
+        }
+      },
+      {
+        $lookup: {
+          from: 'candidates',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'candidateInfo'
+        }
+      },
+      {
+        $unwind: '$candidateInfo'
+      },
+      {
+        $project: {
+          _id: 0,
+          candidateId: '$_id',
+          name: '$candidateInfo.name',
+          party: '$candidateInfo.party',
+          voteCount: 1
+        }
+      },
+      {
+        $sort: { voteCount: -1 }
+      }
+    ]);
+    res.json(stats);
+  } catch (err) {
+    res.status(400).json({ message: 'Error fetching vote stats', error: err.message });
+  }
+};
