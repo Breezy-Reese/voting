@@ -3,12 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import API from '../api';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import HeartIcon from '../components/HeartIcon';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF6B6B'];
 
 const renderCustomLabel = ({ name, percent }) => {
   return `${(percent * 100).toFixed(1)}%`;
 };
+
+const formatNumber = (n) => (typeof n === 'number' ? n.toLocaleString() : n);
+
 
 export default function AdminPanel() {
   const { user, loading: authLoading, logout } = useContext(AuthContext);
@@ -34,6 +38,11 @@ export default function AdminPanel() {
   });
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeSection, setActiveSection] = useState('dashboard');
+  const [candidateSearch, setCandidateSearch] = useState('');
+
+  const filteredCandidates = data.candidates.filter((c) =>
+    c.name?.toLowerCase().includes(candidateSearch.toLowerCase()) || c.party?.toLowerCase().includes(candidateSearch.toLowerCase())
+  );
 
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
@@ -300,21 +309,36 @@ export default function AdminPanel() {
       {/* MAIN CONTENT */}
       <div style={{ flex: 1, overflow: 'auto' }}>
         {/* TOP HEADER */}
-        <div style={{
-          backgroundColor: 'white',
-          padding: '1.5rem 2rem',
-          borderBottom: '1px solid #ddd',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-        }}>
-          <div>
-            <h1 style={{ margin: 0, color: '#1a2332' }}>📊 Admin Dashboard</h1>
-            <p style={{ margin: '0.5rem 0 0 0', color: '#666', fontSize: '0.9rem' }}>Welcome back, {user?.username}!</p>
+        <div style={{ position: 'relative' }}>
+          <div style={{
+            background: 'linear-gradient(90deg,#0f1724 0%, #0b3d91 60%)',
+            color: 'white',
+            padding: '1.5rem 2rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            boxShadow: '0 6px 20px rgba(2,6,23,0.2)',
+            borderRadius: '8px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ width: 56, height: 56, borderRadius: 12, background: 'linear-gradient(135deg,#00C49F,#0088FE)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.6rem' }}>🗳️</div>
+              <div>
+                <h1 style={{ margin: 0, color: 'white', fontSize: '1.4rem' }}>Admin Dashboard</h1>
+                <p style={{ margin: '0.25rem 0 0 0', color: '#cfe7ff', fontSize: '0.9rem' }}>Welcome back, <strong style={{ color: 'white' }}>{user?.username}</strong></p>
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+              <div style={{ textAlign: 'right', color: '#cfe7ff' }}>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+              <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0b3d91', fontWeight: '700' }}>{(user?.username || 'A').charAt(0).toUpperCase()}</div>
+            </div>
           </div>
-          <div style={{ fontSize: '1rem', color: '#666' }}>
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+
+          <div style={{ position: 'absolute', right: '2rem', top: '100%', transform: 'translateY(-25%)' }}>
+            {/* floating quick KPI small card */}
+            <div style={{ background: 'white', padding: '0.75rem 1rem', borderRadius: 8, boxShadow: '0 6px 20px rgba(2,6,23,0.12)' }}>
+              <div style={{ fontSize: '0.85rem', color: '#666' }}>Vote Rate</div>
+              <div style={{ fontWeight: '700', color: '#0b3d91' }}>{data.totalUsers > 0 ? ((data.totalVotes / data.totalUsers) * 100).toFixed(1) : 0}%</div>
+            </div>
           </div>
         </div>
 
@@ -334,7 +358,7 @@ export default function AdminPanel() {
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               border: '2px solid #28a745',
             }}>
-              <h3 style={{ marginTop: 0, marginBottom: '1rem', color: '#28a745' }}>🏥 System Health</h3>
+              <h3 style={{ marginTop: 0, marginBottom: '1rem', color: '#28a745' }}><HeartIcon color="#FF6B6B" /> System Health</h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
                 <div style={{ padding: '1rem', backgroundColor: '#f0f9ff', borderRadius: '4px' }}>
                   <p style={{ margin: 0, fontSize: '0.85rem', color: '#666' }}>Server Status</p>
@@ -521,7 +545,7 @@ export default function AdminPanel() {
             </button>
             {expandedSections.candidates && (
               <div style={{ padding: '1.5rem', borderTop: '1px solid #ddd' }}>
-                {data.candidates.length > 0 ? (
+                {filteredCandidates.length > 0 ? (
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ backgroundColor: '#f5f5f5' }}>
@@ -531,7 +555,7 @@ export default function AdminPanel() {
                       </tr>
                     </thead>
                     <tbody>
-                      {data.candidates.map((c) => (
+                      {filteredCandidates.map((c) => (
                         <tr key={c._id} style={{ borderBottom: '1px solid #eee' }}>
                           <td style={{ padding: '1rem' }}>{c.name}</td>
                           <td style={{ padding: '1rem' }}>{c.party}</td>
@@ -681,7 +705,7 @@ export default function AdminPanel() {
           {/* HEALTH VIEW */}
           {activeSection === 'health' && (
             <div>
-              <h2 style={{ marginBottom: '1.5rem', color: '#1a2332' }}>🏥 System Health Status</h2>
+              <h2 style={{ marginBottom: '1.5rem', color: '#1a2332' }}><HeartIcon color="#FF6B6B" /> System Health Status</h2>
               {health && (
                 <div style={{
                   padding: '2rem',
@@ -776,8 +800,16 @@ export default function AdminPanel() {
                 borderRadius: '8px',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               }}>
-                <h3 style={{ marginTop: 0, marginBottom: '1rem' }}>All Candidates ({data.candidates.length})</h3>
-                {data.candidates.length > 0 ? (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                  <h3 style={{ margin: 0 }}>All Candidates ({data.candidates.length})</h3>
+                  <input
+                    placeholder="Search candidates..."
+                    value={candidateSearch}
+                    onChange={(e) => setCandidateSearch(e.target.value)}
+                    style={{ padding: '0.5rem 0.75rem', borderRadius: 6, border: '1px solid #ddd', width: 240 }}
+                  />
+                </div>
+                {filteredCandidates.length > 0 ? (
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ backgroundColor: '#f5f5f5' }}>
@@ -787,7 +819,7 @@ export default function AdminPanel() {
                       </tr>
                     </thead>
                     <tbody>
-                      {data.candidates.map((c) => (
+                      {filteredCandidates.map((c) => (
                         <tr key={c._id} style={{ borderBottom: '1px solid #eee' }}>
                           <td style={{ padding: '1rem' }}>{c.name}</td>
                           <td style={{ padding: '1rem' }}>{c.party}</td>

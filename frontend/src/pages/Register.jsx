@@ -197,7 +197,6 @@ export default function Register() {
         width: '100%',
         maxWidth: '400px'
       }}>
-        <h1 style={{ textAlign: 'center', marginBottom: '1rem' }}>Online Voting System</h1>
         <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Register</h2>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column' }}>

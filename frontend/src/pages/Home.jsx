@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../api';
 import VoteForm from '../components/VoteForm';
+import { useToast } from '../components/Toast';
 import { AuthContext } from '../context/AuthContext';
 
 export default function Home() {
@@ -17,14 +18,16 @@ export default function Home() {
   const handleVote = (id) => {
     API.post('/votes', { candidate: id })
       .then(res => {
-        alert('Vote cast successfully!');
+        toast.push('Vote cast successfully!');
         // Optionally refetch candidates to update vote counts
         API.get('/candidates')
           .then(res => setCandidates(res.data))
           .catch(err => console.error(err));
       })
-      .catch(err => alert(err.response?.data?.message || 'Error casting vote'));
+      .catch(err => toast.push(err.response?.data?.message || 'Error casting vote'));
   };
+
+  const toast = useToast();
 
   if (!user) {
     return (

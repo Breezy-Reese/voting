@@ -217,7 +217,6 @@ export default function Auth() {
         width: '100%',
         maxWidth: '400px'
       }}>
-        <h1 style={{ textAlign: 'center', marginBottom: '1rem' }}>Online Voting System</h1>
         
         {/* Tab buttons */}
         <div style={{ display: 'flex', marginBottom: '1.5rem' }}>

@@ -1,16 +1,24 @@
-export default function CandidateCard({ candidate, isSelected, onToggle }) {
+export default function CandidateCard({ candidate, isSelected, onToggle, onVote }) {
   return (
-    <div className="candidate-card" style={{ border: '1px solid #ddd', padding: '1rem', marginBottom: '1rem', borderRadius: '8px' }}>
-      <img src={candidate.profilePic} alt={`${candidate.name} profile`} style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
-      <h3>{candidate.name}</h3>
-      <p>Party: {candidate.party}</p>
-      <p>Votes: {candidate.votes}</p>
-      <input
-        type="checkbox"
-        checked={isSelected}
-        onChange={() => onToggle(candidate._id)}
-      />
-      <label> Select to vote</label>
-    </div>
+    <article className="candidate-card" aria-label={`Candidate ${candidate.name}`}>
+      <img src={candidate.profilePic || '/public/default-avatar.png'} alt={`${candidate.name} profile`} />
+      <div className="candidate-info">
+        <h4 className="candidate-name">{candidate.name}</h4>
+        <div className="candidate-stats">
+          <span className="party-badge">{candidate.party}</span>
+          <span>•</span>
+          <span>{candidate.votes ?? 0} votes</span>
+        </div>
+        {candidate.bio && <div className="candidate-bio">{candidate.bio}</div>}
+      </div>
+
+      <div className="candidate-actions">
+        <div className="vote-badge">{candidate.votes ?? 0}</div>
+        <div style={{ display:'flex', gap:8 }}>
+          <button className="vote-btn" onClick={(e)=>{ e.stopPropagation(); onVote && onVote(candidate._id); }}>Vote</button>
+          <button className="vote-btn secondary" onClick={(e)=>{ e.stopPropagation(); onToggle(candidate._id); }}>{isSelected ? 'Selected' : 'Select'}</button>
+        </div>
+      </div>
+    </article>
   );
 }

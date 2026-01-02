@@ -2,21 +2,23 @@ import { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import API from '../api';
+import { useToast } from '../components/Toast';
 
 export default function Login() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const toast = useToast();
 
   const checkAdminStatus = async () => {
     try {
       const res = await API.get('/auth/debug/admin-check');
       console.log('Admin check response:', res.data);
-      alert(JSON.stringify(res.data, null, 2));
+      toast.push(JSON.stringify(res.data, null, 2));
     } catch (err) {
       console.error('Admin check error:', err);
-      alert('Error checking admin status');
+      toast.push('Error checking admin status');
     }
   };
 
@@ -44,7 +46,7 @@ export default function Login() {
       }
     } catch (err) {
       console.error('===== LOGIN ERROR =====', err);
-      alert('Login failed! Check credentials.');
+      toast.push('Login failed! Check credentials.');
     }
   };
 
@@ -64,7 +66,6 @@ export default function Login() {
         width: '100%',
         maxWidth: '400px'
       }}>
-        <h1 style={{ textAlign: 'center', marginBottom: '1rem' }}>Online Voting System</h1>
         <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Login</h2>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column' }}>

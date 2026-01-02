@@ -6,13 +6,13 @@ export default function VoteForm({ candidate, onVote }) {
   };
 
   return (
-    <div style={{ border: '1px solid #ddd', padding: '1rem', marginBottom: '1rem', borderRadius: '8px' }}>
+    <div className="vote-form">
       <h3>{candidate.name}</h3>
-      <p>Party: {candidate.party}</p>
-      <p>Votes: {candidate.votes}</p>
-      <button onClick={handleVote} style={{ marginTop: '0.5rem', padding: '0.5rem 1rem' }}>
-        Vote
-      </button>
+      <p style={{ color: '#6b7280', marginTop: 6 }}>Party: <strong style={{ color: '#0b2540' }}>{candidate.party}</strong></p>
+      <p style={{ marginTop: 8 }}>{candidate.votes ?? 0} votes</p>
+      <div style={{ marginTop: 12 }}>
+        <button className="vote-btn" onClick={handleVote}>Vote</button>
+      </div>
     </div>
   );
 }
